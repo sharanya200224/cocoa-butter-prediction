@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cocoa Butter Processing Methods</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #5D4037;
+            --secondary: #8D6E63;
+            --accent: #D7CCC8;
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --danger: #F44336;
+            --light: #FFF8F0;
+            --dark: #3E2723;
+            --step1: #6A1B9A;
+            --step2: #0288D1;
+            --step3: #388E3C;
+            --step4: #D32F2F;
+            --step5: #7B1FA2;
+            --step6: #0097A7;
+            --step7: #FFA000;
+            --step8: #5D4037;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 100%);
+            min-height: 100vh;
+            color: var(--light);
+            overflow-x: hidden;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 1s ease;
+        }
+        
+        .header-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(129, 93, 83, 0.3) 0%, rgba(78, 52, 46, 0) 70%);
+            z-index: -1;
+        }
+        
+        .floating-beans {
+            position: absolute;
+            width: 30px;
+            height: 20px;
+            background: var(--secondary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 8s infinite ease-in-out;
+        }
+        
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            color: var(--light);
+            letter-spacing: 1px;
+            animation: titleFloat 4s infinite ease-in-out;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+            color: var(--accent);
+        }
+        
+        .process-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .process-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .process-header h2 {
+            font-size: 2.2rem;
+            color: var(--light);
+            margin-bottom: 15px;
+        }
+        
+        .process-header p {
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.7;
+            color: var(--accent);
+        }
+        
+        .process-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            position: relative;
+        }
+        
+        .process-steps::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 60px;
+            height: calc(100% - 80px);
+            width: 4px;
+            background: linear-gradient(to bottom, var(--step1), var(--step2), var(--step3), var(--step4), var(--step5), var(--step6), var(--step7), var(--step8));
+            border-radius: 10px;
+            z-index: 1;
+        }
+        
+        .process-step {
+            display: flex;
+            gap: 30px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .step-icon {
+            width: 120px;
+            height: 120px;
+            background: var(--dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            border: 4px solid;
+            transition: all 0.4s ease;
+        }
+        
+        .step-icon:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+        }
+        
+        .step-icon i {
+            font-size: 3rem;
+            color: white;
+        }
+        
+        .step-content {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 25px;
+            flex-grow: 1;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border-left: 5px solid;
+            transition: all 0.3s ease;
+        }
+        
+        .step-content:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        
+        .step-content h3 {
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .step-content h3 i {
+            margin-right: 10px;
+        }
+        
+        .step-content p {
+            line-height: 1.7;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+        
+        .step-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .detail-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .detail-card h4 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+            color: var(--light);
+        }
+        
+        .detail-card p {
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+        
+        .process-visual {
+            display: flex;
+            justify-content: center;
+            margin: 50px 0;
+        }
+        
+        .process-flow {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            max-width: 1000px;
+        }
+        
+        .flow-step {
+            width: 100px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .flow-step:not(:last-child)::after {
+            content: '→';
+            position: absolute;
+            right: -25px;
+            top: 30px;
+            font-size: 2rem;
+            color: var(--accent);
+        }
+        
+        .flow-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 1.8rem;
+            color: white;
+            border: 3px solid;
+        }
+        
+        .flow-step p {
+            font-size: 0.9rem;
+            color: var(--accent);
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            padding: 25px;
+            font-size: 0.9rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideInLeft {
+            from { transform: translateX(-50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes growCircle {
+            from { transform: scale(0.5) rotate(90deg); opacity: 0; }
+            to { transform: scale(1) rotate(0); opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fadeInUp {
+            from { transform: translateY(30px) scale(0.8); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+        
+        @keyframes titleFloat {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0); }
+        }
+        
+        .fadeInUp {
+            animation: fadeInUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        
+        /* Responsive */
+        @media (max-width: 900px) {
+            .process-steps::before {
+                left: 45px;
+            }
+            
+            .step-icon {
+                width: 90px;
+                height: 90px;
+            }
+            
+            .step-icon i {
+                font-size: 2.2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .process-container {
+                padding: 20px;
+            }
+            
+            .process-steps {
+                gap: 40px;
+            }
+            
+            .process-steps::before {
+                display: none;
+            }
+            
+            .process-step {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .step-content {
+                border-left: none;
+                border-top: 5px solid;
+            }
+            
+            .step-content h3 {
+                justify-content: center;
+            }
+            
+            .flow-step:not(:last-child)::after {
+                display: none;
+            }
+            
+            .flow-step {
+                width: 100%;
+                max-width: 200px;
+            }
+            
+            .process-flow {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-bg"></div>
+            <div class="floating-beans"></div>
+            <div class="floating-beans"></div>
+            <div class="floating-beans"></div>
+            <h1><i class="fas fa-industry"></i> Cocoa Butter Processing Methods</h1>
+            <p>Discover the journey from cocoa beans to premium cocoa butter through traditional and modern techniques</p>
+        </header>
+        
+        <div class="process-container">
+            <div class="process-header">
+                <h2>From Bean to Butter: The 8-Step Process</h2>
+                <p>Learn how cocoa beans are transformed into the rich, luxurious cocoa butter used in cosmetics and chocolate</p>
+            </div>
+            
+            <div class="process-steps">
+                <!-- Step 1: Collecting -->
+                <div class="process-step">
+                    <div class="step-icon" style="background: var(--step1); border-color: var(--step1);">
+                        <i class="fas fa-seedling"></i>
+                    </div>
+                    <div class="step-content" style="border-color: var(--step1);">
+                        <h3><i class="fas fa-1"></i> Harvesting & Collecting</h3>
+                        <p>Cocoa pods are harvested by hand when fully ripe. Farmers carefully cut the pods from trees without damaging the flower cushions, ensuring future harvests. The pods are then opened to extract the cocoa beans surrounded by sweet white pulp.</p>
+                        <div class="step-details">
+                            <div class="detail-card">
+                                <h4>Harvest Season</h4>
+                                <p>Main harvest: Oct-Feb, Mid-crop: May-Aug</p>
+                            </div>
+                            <div class="detail-card">
+                                <h4>Yield</h4>
+                                <p>30-40 pods per tree annually</p>
+                            </div>
+                            <div class="detail-card">
+                                <h4>Quality Check</h4>
+                                <p>Only ripe, undamaged pods selected</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 2: Cleaning -->
+                <div class="process-step">
+                    <div class="step-icon" style="background: var(--step2); border-color: var(--step2);">
+                        <i class="fas fa-broom"></i>
+                    </div>
+                    <div class="step-content" style="border-color: var(--step2);">
+                        <h3><i class="fas fa-2"></i> Cleaning & Sorting</h3>
+                        <p>Fresh cocoa beans are cleaned to remove debris, stones, and damaged beans. They're sorted by size and quality using vibrating screens and optical sorters. This critical step ensures only premium beans continue in the process.</p>
+                        <div class="step-details">
+                            <div class="detail-card">
+                                <h4>Debris Removal</h4>
+                                <p>Sticks, leaves, stones removed</p>
+                            </div>
+                            <div class="detail-card">
+                                <h4>Quality Sorting</h4>
+                                <p>Defective beans discarded</p>
+                            </div>
+                            <div class="detail-card">
+                                <h4>Size Grading</h4>
+                                <p>Uniform beans for even processing</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 3: Roasting -->
+                <div class="process-step">
+                    <div class="step-icon" style="background: var(--step3); border-color: var(--step3);">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="step-content" style="border-color: var(--step3);">
+                        <h3><i class="fas fa-3"></i> Roasting</h3>
+                        <p>Beans are roasted at 120-140°C for 20-40 minutes to develop flavor and aroma. This critical step reduces moisture, loosens shells, and triggers Maillard reactions that create complex flavor compounds.</p>
+                        <div class="step-details">
+                            <div class="detail-card">
+                                <h4>Temperature</h4>
+                                <p>120-140°C (248-284°F)</p>
+                            </div>
+                            <div class="detail-card">
+                                <h4>Duration</h4>
+                                <p>20-40 minutes</p>
+                            </div>
+                            <div class="detail-card">
+                                <h4>Flavor Development</h4>
+                                <p>Maillard reactions create complex flavors</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 4: Crushing & Winnowing -->
+                <div class="process-step">
+                    <div class="step-icon" style="background: var(--step4); border-color: var(--step4);">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <div class="step-content" style="border-color: var(--step4);">
+                        <h3><i class="fas fa-4"></i> Crushing & Winnowing</h3>
+                        <p>Roasted beans are cracked to separate the brittle shells from the nibs (cocoa meat). Winnowing uses air streams to blow away lighter shells while heavier nibs fall through. This produces pure cocoa nibs ready for grinding.</p>
+                        <div class="step-details">
+                            <div class="detail-card">
+                                <h4>Shell Removal</h4>
+                                <p>95-99% efficiency</p>
+                            </div>
+                            <div class="detail-card">
+                                <h4>Nib Size</h4>
+                                <p>3-8mm particles</p>
+                            </div>
+                            <div class="detail-card">
+                                <h4>Quality Control</h4>
+                                <p>Infrared sorting for purity</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 5: Grinding -->
+                <div class="process-step">
+                    <div class="step-icon" style="background: var(--step5); border-color: var(--step5);">
+                        <i class="fas fa-blender"></i>
+                    </div>
+                    <div class="step-content" style="border-color: var(--step5);">
+                        <h3><i class="fas fa-5"></i> Grinding Cocoa Mass</h3>
+                        <p>Cocoa nibs are ground into a thick paste called cocoa liquor or cocoa mass. Friction from grinding stones generates heat (50-70°C), melting cocoa butter and creating a smooth liquid. This takes 18-72 hours depending on desired fineness.</p>
+                        <div class="step-details">
+                            <div class="detail-card">
+                                <h4>Temperature</h4>
+                                <p>50-70°C (122-158°F)</p>
+                            </div>
+                            <div class="detail-card">
+                                <h4>Particle Size</h4>
+                                <p>15-30 microns</p>
+                            </div>
+                            <div class="detail-card">
+                                <h4>Duration</h4>
+                                <p>18-72 hours</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 6: Pressing -->
+                <div class="process-step">
+                    <div class="step-icon" style="background: var(--step6); border-color: var(--step6);">
+                        <i class="fas fa-compress-arrows-alt"></i>
+                    </div>
+                    <div class="step-content" style="border-color: var(--step6);">
+                        <h3><i class="fas fa-6"></i> Pressing Cocoa Butter</h3>
+                        <p>Cocoa liquor is pressed under high pressure (400-500 bar) to separate cocoa butter from cocoa solids. Hydraulic presses extract 40-50% of the liquor as butter. The remaining solids form cocoa cakes which are ground into powder.</p>
+                        <div class="step-details">
+                            <div class="detail-card">
+                                <h4>Pressure</h4>
+                                <p>400-500 bar</p>
+                            </div>
+                            <div class="detail-card">
+                                <h4>Yield</h4>
+                                <p>40-50% butter extraction</p>
+                            </div>
+                            <div class="detail-card">
+                                <h4>Cocoa Cake</h4>
+                                <p>10-12% residual fat content</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 7: Filtration -->
+                <div class="process-step">
+                    <div class="step-icon" style="background: var(--step7); border-color: var(--step7);">
+                        <i class="fas fa-filter"></i>
+                    </div>
+                    <div class="step-content" style="border-color: var(--step7);">
+                        <h3><i class="fas fa-7"></i> Filtration & Purification</h3>
+                        <p>Raw cocoa butter is filtered through fine screens (10-25μm) to remove any solid particles. For premium cosmetic-grade butter, additional purification steps may include activated carbon filtration to remove impurities and odors.</p>
+                        <div class="step-details">
+                            <div class="detail-card">
+                                <h4>Filtration Level</h4>
+                                <p>10-25 micron filters</p>
+                            </div>
+                            <div class="detail-card">
+                                <h4>Deodorization</h4>
+                                <p>Steam treatment at 200-220°C</p>
+                            </div>
+                            <div class="detail-card">
+                                <h4>Impurity Removal</h4>
+                                <p>Activated carbon filtration</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 8: Cooling -->
+                <div class="process-step">
+                    <div class="step-icon" style="background: var(--step8); border-color: var(--step8);">
+                        <i class="fas fa-snowflake"></i>
+                    </div>
+                    <div class="step-content" style="border-color: var(--step8);">
+                        <h3><i class="fas fa-8"></i> Tempering & Cooling</h3>
+                        <p>Butter is slowly cooled under controlled conditions (18-20°C) to promote proper crystallization. This tempering process stabilizes the butter's polymorphic structure, ensuring consistent melting properties and texture.</p>
+                        <div class="step-details">
+                            <div class="detail-card">
+                                <h4>Cooling Rate</h4>
+                                <p>2-3°C per minute</p>
+                            </div>
+                            <div class="detail-card">
+                                <h4>Temperature</h4>
+                                <p>18-20°C (64-68°F)</p>
+                            </div>
+                            <div class="detail-card">
+                                <h4>Crystallization</h4>
+                                <p>Form V crystals for stability</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="process-visual">
+                <div class="process-flow">
+                    <div class="flow-step">
+                        <div class="flow-icon" style="background: var(--step1); border-color: var(--step1);">
+                            <i class="fas fa-seedling"></i>
+                        </div>
+                        <p>Collecting</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-icon" style="background: var(--step2); border-color: var(--step2);">
+                            <i class="fas fa-broom"></i>
+                        </div>
+                        <p>Cleaning</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-icon" style="background: var(--step3); border-color: var(--step3);">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <p>Roasting</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-icon" style="background: var(--step4); border-color: var(--step4);">
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                        <p>Crushing</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-icon" style="background: var(--step5); border-color: var(--step5);">
+                            <i class="fas fa-blender"></i>
+                        </div>
+                        <p>Grinding</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-icon" style="background: var(--step6); border-color: var(--step6);">
+                            <i class="fas fa-compress-arrows-alt"></i>
+                        </div>
+                        <p>Pressing</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-icon" style="background: var(--step7); border-color: var(--step7);">
+                            <i class="fas fa-filter"></i>
+                        </div>
+                        <p>Filtration</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-icon" style="background: var(--step8); border-color: var(--step8);">
+                            <i class="fas fa-snowflake"></i>
+                        </div>
+                        <p>Cooling</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Cocoa Butter Processing Methods | Traditional & Modern Techniques | © 2023</p>
+        </footer>
+    </div>
+    
+    <script>
+        // Initialize floating beans
+        function createFloatingBeans() {
+            const header = document.querySelector('header');
+            for (let i = 0; i < 8; i++) {
+                const bean = document.createElement('div');
+                bean.classList.add('floating-beans');
+                bean.style.left = Math.random() * 100 + '%';
+                bean.style.top = Math.random() * 100 + '%';
+                bean.style.animationDelay = Math.random() * 5 + 's';
+                bean.style.width = (Math.random() * 20 + 10) + 'px';
+                bean.style.height = (Math.random() * 10 + 8) + 'px';
+                header.appendChild(bean);
+            }
+        }
+        
+        // Initialize step animations
+        function animateSteps() {
+            const steps = document.querySelectorAll('.process-step');
+            steps.forEach((step, index) => {
+                step.style.animationDelay = `${index * 0.2}s`;
+                step.classList.add('fadeInUp');
+            });
+        }
+        
+        // Initialize page
+        window.addEventListener('load', function() {
+            createFloatingBeans();
+            animateSteps();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cocoa Processing Steps</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #5D4037;
+            --secondary: #8D6E63;
+            --accent: #D7CCC8;
+            --light: #FFF8F0;
+            --dark: #3E2723;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 100%);
+            min-height: 100vh;
+            color: var(--light);
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            padding: 30px 0;
+        }
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .process-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 2px solid var(--secondary);
+        }
+        .process-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .process-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .process-card h3 {
+            font-size: 1.3rem;
+            padding: 10px;
+            color: var(--accent);
+            text-align: center;
+        }
+        .process-card .tagline {
+            font-size: 0.9rem;
+            padding: 0 10px 10px;
+            color: var(--light);
+            text-align: center;
+            font-style: italic;
+        }
+        .process-details {
+            display: none;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-top: 10px;
+            line-height: 1.6;
+        }
+        .process-details.active {
+            display: block;
+        }
+        .back-btn {
+            display: inline-block;
+            background: var(--secondary);
+            color: var(--light);
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: background 0.3s ease;
+        }
+        .back-btn:hover {
+            background: var(--primary);
+        }
+        @media (max-width: 600px) {
+            .process-grid {
+                grid-template-columns: 1fr;
+            }
+            .process-card img {
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-cogs"></i> Cocoa Processing Steps</h1>
+        </header>
+        <div class="process-grid">
+            <div class="process-card" data-step="harvesting">
+                <img src="https://img.freepik.com/premium-photo/cocoa-bean-harvesting-scene-cocoa-plantation-harvesting_128711-18725.jpg" alt="Harvesting">
+                <h3>Harvesting</h3>
+                <p class="tagline">Picking the Perfect Pod</p>
+                <div class="process-details">
+                    <p>Cocoa pods are harvested from cocoa trees, typically twice a year during the main and mid-crop seasons. Skilled farmers select fully ripened pods, which are cut from the tree using machetes or specialized tools. The timing of harvest is critical to ensure optimal bean quality, as unripe or overripe pods can affect flavor and yield.</p>
+                </div>
+            </div>
+            <div class="process-card" data-step="fermentation">
+                <img src="https://www.cocoterra.com/wp-content/uploads/cacao-fermentation-process-hand-980x653.png" alt="Fermentation">
+                <h3>Fermentation</h3>
+                <p class="tagline">Unlocking Rich Flavors</p>
+                <div class="process-details">
+                    <p>After harvesting, beans are removed from the pods and fermented for 2–7 days. Fermentation develops the cocoa's flavor profile and reduces bitterness. Common methods include heap (piling beans under banana leaves), box (wooden containers), or mechanical fermentation. Proper fermentation is essential for high-quality cocoa butter.</p>
+                </div>
+            </div>
+            <div class="process-card" data-step="drying">
+                <img src="https://thechocolatelife.com/content/images/2022/05/Gallery3-AgroflorestaMexico1280x720.jpg" alt="Drying">
+                <h3>Drying</h3>
+                <p class="tagline">Preserving Bean Purity</p>
+                <div class="process-details">
+                    <p>Fermented beans are dried in the sun or mechanically to reduce moisture content to 6–8%. This prevents mold growth and stabilizes the beans for storage or transport. Sun-drying on raised platforms is traditional, but mechanical dryers are used for consistency in humid climates.</p>
+                </div>
+            </div>
+            <div class="process-card" data-step="roasting">
+                <img src="https://mldvsdannycf.i.optimole.com/AqwVD6s-cUPpvq82/w:800/h:476/q:55/https://chocolatephayanak.com/wp-content/uploads/Roastin-Cocoa-on-Stove.jpg" alt="Roasting">
+                <h3>Roasting</h3>
+                <p class="tagline">Enhancing Aroma</p>
+                <div class="process-details">
+                    <p>Beans are roasted at 120–150°C to enhance flavor, kill bacteria, and facilitate shell removal. Roasting duration and temperature affect the final cocoa butter's aroma and quality. Over-roasting can lead to burnt flavors, while under-roasting may leave undesirable notes.</p>
+                </div>
+            </div>
+            <div class="process-card" data-step="winnowing">
+                <img src="https://i0.wp.com/www.chocovira.in/wp-content/uploads/2020/06/Cracking-and-Winnowing-cocoa-beans-chocolate.jpg?fit=960%2C500&ssl=1" alt="Winnowing">
+                <h3>Winnowing</h3>
+                <p class="tagline">Separating the Essence</p>
+                <div class="process-details">
+                    <p>Roasted beans are cracked to separate the nibs (edible part) from the shells. Winnowing machines use air to remove the lighter shells, leaving clean nibs. This step ensures purity in the subsequent grinding process, impacting the quality of cocoa butter.</p>
+                </div>
+            </div>
+            <div class="process-card" data-step="grinding">
+                <img src="https://recipes.net/wp-content/uploads/2024/01/how-to-grind-cacao-nibs-1704285026.jpg" alt="Grinding">
+                <h3>Grinding</h3>
+                <p class="tagline">Releasing the Butter</p>
+                <div class="process-details">
+                    <p>Cocoa nibs are ground into cocoa liquor, a paste that releases cocoa butter. The grinding process generates heat, melting the fat within the nibs. Fine grinding ensures a smooth texture, which is critical for high-quality cocoa butter used in cosmetics.</p>
+                </div>
+            </div>
+            <div class="process-card" data-step="pressing">
+                <img src="https://www.nutmachines.com/uploads/allimg/190327/4-1Z32H102464U.jpg" alt="Pressing">
+                <h3>Pressing</h3>
+                <p class="tagline">Extracting Pure Gold</p>
+                <div class="process-details">
+                    <p>Cocoa liquor is pressed using hydraulic presses to separate cocoa butter from cocoa solids (cocoa powder). The pressure and duration affect the yield and purity of the butter. High-quality cocoa butter requires careful pressing to avoid contamination.</p>
+                </div>
+            </div>
+            <div class="process-card" data-step="refining">
+                <img src="https://www.ice.edu/sites/default/files/inline-images/migrated/2015/08/butter-and-refining-550x371.jpg" alt="Refining">
+                <h3>Refining</h3>
+                <p class="tagline">Polishing for Perfection</p>
+                <div class="process-details">
+                    <p>Cocoa butter is refined through filtration (to remove impurities), deodorization (to eliminate odors), and sometimes fractionation (to separate triglycerides). These steps ensure the butter meets cosmetic-grade standards, with optimal clarity, odor, and stability.</p>
+                </div>
+            </div>
+            <div class="process-card" data-step="conching">
+                <img src="https://images.unsplash.com/photo-1601594473988-76c44d8f62c8?auto=format&fit=crop&w=250" alt="Conching">
+                <h3>Conching</h3>
+                <p class="tagline">Smoothing the Finish</p>
+                <div class="process-details">
+                    <p>Conching is an optional step where cocoa butter or chocolate is mixed and heated (68–78°C) for 4–8 hours to improve texture and consistency. For cosmetic applications, conching ensures a smooth, creamy texture, enhancing the butter’s suitability for skin products.</p>
+                </div>
+            </div>
+        </div>
+        <a href="/" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Home</a>
+    </div>
+    <script>
+        const processCards = document.querySelectorAll('.process-card');
+        processCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const details = card.querySelector('.process-details');
+                const isActive = details.classList.contains('active');
+                
+                // Hide all details
+                document.querySelectorAll('.process-details').forEach(detail => {
+                    detail.classList.remove('active');
+                });
+                
+                // Show clicked card's details if not already active
+                if (!isActive) {
+                    details.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

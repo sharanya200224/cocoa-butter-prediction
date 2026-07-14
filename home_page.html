@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cocoa Butter Analysis System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #5D4037;
+            --secondary: #8D6E63;
+            --accent: #D7CCC8;
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --danger: #F44336;
+            --light: #FFF8F0;
+            --dark: #3E2723;
+            --button1: #6A1B9A;
+            --button2: #0288D1;
+            --button3: #388E3C;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 100%);
+            min-height: 100vh;
+            color: var(--light);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        /* Navigation */
+        nav {
+            width: 100%;
+            padding: 20px 0;
+            margin-bottom: 20px;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--accent);
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--light);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .nav-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 10px 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--light);
+        }
+        
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover:after {
+            width: 100%;
+        }
+        
+        .nav-link.active {
+            color: var(--light);
+        }
+        
+        .nav-link.active:after {
+            width: 100%;
+            background: var(--light);
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0 50px;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            animation: fadeIn 1s ease;
+            z-index: 1;
+        }
+        
+        .header-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(129, 93, 83, 0.3) 0%, rgba(78, 52, 46, 0) 70%);
+            z-index: -1;
+        }
+        
+        .floating-beans {
+            position: absolute;
+            width: 30px;
+            height: 20px;
+            background: var(--secondary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 8s infinite ease-in-out;
+        }
+        
+        header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            color: var(--light);
+            letter-spacing: 1px;
+            animation: titleFloat 4s infinite ease-in-out;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+        }
+        
+        header p {
+            font-size: 1.4rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+            color: var(--accent);
+            padding: 0 20px;
+        }
+        
+        .hero-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 40px 0;
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+        }
+        
+        .cocoa-butter-img {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            animation: pulse 3s infinite ease-in-out;
+            border: 5px solid var(--accent);
+        }
+        
+        .cocoa-butter-img i {
+            font-size: 8rem;
+            color: var(--light);
+            opacity: 0.8;
+        }
+        
+        .app-description {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 50px;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: var(--accent);
+            padding: 0 20px;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            width: 100%;
+            max-width: 1000px;
+        }
+        
+        .cta-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 300px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            border: 2px solid transparent;
+            z-index: 1;
+            cursor: pointer;
+        }
+        
+        .cta-button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-15px) scale(1.03);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+            border: 2px solid var(--accent);
+        }
+        
+        .cta-button:hover:before {
+            opacity: 1;
+        }
+        
+        .cta-button:hover .cta-icon {
+            transform: scale(1.2) rotate(10deg);
+            color: var(--light);
+        }
+        
+        .cta-button:nth-child(1) {
+            border-top: 5px solid var(--button1);
+        }
+        
+        .cta-button:nth-child(2) {
+            border-top: 5px solid var(--button2);
+        }
+        
+        .cta-button:nth-child(3) {
+            border-top: 5px solid var(--button3);
+        }
+        
+        .cta-icon {
+            font-size: 5rem;
+            margin-bottom: 25px;
+            color: var(--accent);
+            transition: all 0.4s ease;
+        }
+        
+        .cta-title {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--light);
+        }
+        
+        .cta-description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--accent);
+            margin-bottom: 25px;
+        }
+        
+        .action-button {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+        }
+        
+        .action-button:hover i {
+            transform: translateX(5px);
+        }
+        
+        .action-button i {
+            transition: transform 0.4s ease;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 50px 0;
+        }
+        
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .dashboard-card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .dashboard-card-header i {
+            font-size: 2.5rem;
+            margin-right: 15px;
+            color: var(--accent);
+        }
+        
+        .dashboard-card-header h2 {
+            font-size: 1.8rem;
+            color: var(--light);
+        }
+        
+        .dashboard-card-content {
+            margin-bottom: 25px;
+        }
+        
+        .dashboard-card-content p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+        
+        .feature-list {
+            list-style-type: none;
+            margin-top: 15px;
+        }
+        
+        .feature-list li {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            font-size: 1.05rem;
+            color: var(--accent);
+        }
+        
+        .feature-list li i {
+            color: var(--success);
+            margin-right: 10px;
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .dashboard-card-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .dashboard-button {
+            background: transparent;
+            color: var(--light);
+            border: 2px solid var(--accent);
+            padding: 10px 25px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .dashboard-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+        }
+        
+        .dashboard-button:hover i {
+            transform: translateX(3px);
+        }
+        
+        .dashboard-button i {
+            transition: transform 0.3s ease;
+        }
+        
+        .analysis-card {
+            border-top: 4px solid var(--button1);
+        }
+        
+        .skin-card {
+            border-top: 4px solid var(--button2);
+        }
+        
+        .process-card {
+            border-top: 4px solid var(--button3);
+        }
+        
+        .system-overview {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 60px 0;
+            width: 100%;
+            max-width: 1000px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .overview-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .overview-header h2 {
+            font-size: 2.2rem;
+            color: var(--light);
+            margin-bottom: 15px;
+        }
+        
+        .overview-header p {
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.7;
+            color: var(--accent);
+        }
+        
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .overview-item {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .overview-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.12);
+        }
+        
+        .overview-item i {
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+        
+        .overview-item h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: var(--light);
+        }
+        
+        .overview-item p {
+            font-size: 1rem;
+            color: var(--accent);
+            line-height: 1.6;
+        }
+        
+        footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            padding: 40px 20px 20px;
+            font-size: 1rem;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* API Status Indicator */
+        .api-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            z-index: 100;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .status-connected {
+            background-color: var(--success);
+        }
+        
+        .status-disconnected {
+            background-color: var(--danger);
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fadeInUp {
+            from { transform: translateY(30px) scale(0.8); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+        
+        @keyframes titleFloat {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+        
+        .fadeInUp {
+            animation: fadeInUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1100px) {
+            .cta-buttons {
+                max-width: 700px;
+            }
+            
+            .cta-button {
+                width: 330px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.5rem;
+            }
+            
+            header p {
+                font-size: 1.2rem;
+            }
+            
+            .cocoa-butter-img {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .cocoa-butter-img i {
+                font-size: 5rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .cta-button {
+                width: 100%;
+                max-width: 400px;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                gap: 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .overview-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+        }
+
+        /* New Styles for Analysis Form */
+        .analysis-form {
+            display: none;
+            margin-top: 20px;
+        }
+        .analysis-form.active {
+            display: block;
+        }
+        .analysis-form label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            color: var(--light);
+        }
+        .analysis-form input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid var(--accent);
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            font-size: 1rem;
+        }
+        .analysis-form button {
+            background: var(--button1);
+            color: var(--light);
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .analysis-form button:hover {
+            background: darken(var(--button1), 10%);
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <nav>
+            <div class="nav-container">
+                <div class="logo">
+                    <i class="fas fa-leaf logo-icon"></i>
+                    <div class="logo-text">CocoaScan System</div>
+                </div>
+                <div class="nav-links">
+                    <a href="#home" class="nav-link active">Home</a>
+                    <a href="/index1" class="nav-link">Analysis</a>
+                    <a href="/skin" class="nav-link">Skin Types</a>
+                    <a href="/processing" class="nav-link">Processing</a>
+                </div>
+            </div>
+        </nav>
+        
+        <header id="home">
+            <div class="header-bg"></div>
+            <div class="floating-beans"></div>
+            <div class="floating-beans"></div>
+            <div class="floating-beans"></div>
+            <h1><i class="fas fa-seedling"></i> Cocoa Butter Analysis System</h1>
+            <p>Advanced Quality Assessment, Skin Recommendations & Processing Insights</p>
+        </header>
+        
+        <div class="hero-section">
+            <div class="cocoa-butter-img">
+                <i class="fas fa-spa"></i>
+            </div>
+            
+            <div class="app-description">
+                <p>Our comprehensive platform combines laboratory-grade analysis with intelligent skin type recommendations and detailed processing methods. Discover the full journey of cocoa butter from bean to final product.</p>
+            </div>
+            
+            <div class="cta-buttons">
+                <div class="cta-button" onclick="navigateToAnalysis()">
+                    <div class="cta-icon">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <h3 class="cta-title">Analyze Cocoa Butter</h3>
+                    <p class="cta-description">Input laboratory measurements to assess quality, identify potential issues, and get refining recommendations.</p>
+                    <button class="action-button">
+                        Analyze Quality <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <div class="cta-button" onclick="navigateToSkin()">
+                    <div class="cta-icon">
+                        <i class="fas fa-spa"></i>
+                    </div>
+                    <h3 class="cta-title">Skin Type Recommendation</h3>
+                    <p class="cta-description">Discover personalized skincare products based on cocoa butter properties and your skin type.</p>
+                    <button class="action-button">
+                        Get Recommendations <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <div class="cta-button" onclick="navigateToProcessing()">
+                    <div class="cta-icon">
+                        <i class="fas fa-industry"></i>
+                    </div>
+                    <h3 class="cta-title">Processing Methods</h3>
+                    <p class="cta-description">Explore traditional and modern techniques for transforming cocoa beans into premium butter.</p>
+                    <button class="action-button">
+                        View Methods <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Analysis Section -->
+        <div class="system-overview" id="analysis">
+            <div class="overview-header">
+                <h2><i class="fas fa-flask"></i> Cocoa Butter Analysis</h2>
+                <p>Input laboratory measurements to assess quality, identify potential issues, and get refining recommendations</p>
+            </div>
+            
+            <div class="dashboard">
+                <div class="dashboard-card analysis-card">
+                    <div class="dashboard-card-header">
+                        <i class="fas fa-vial"></i>
+                        <h2>Quality Assessment</h2>
+                    </div>
+                    <div class="dashboard-card-content">
+                        <p>Our advanced analysis system evaluates cocoa butter quality through comprehensive testing of chemical and physical properties.</p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check-circle"></i> Fatty acid profile assessment</li>
+                            <li><i class="fas fa-check-circle"></i> Contaminant detection</li>
+                            <li><i class="fas fa-check-circle"></i> Oxidation stability testing</li>
+                            <li><i class="fas fa-check-circle"></i> Quality scoring system</li>
+                        </ul>
+                        <form id="analysisForm" class="analysis-form">
+                            <label for="oleic_acid">Oleic Acid (%):</label>
+                            <input type="number" id="oleic_acid" name="oleic_acid" step="0.1" required>
+                            <label for="stearic_acid">Stearic Acid (%):</label>
+                            <input type="number" id="stearic_acid" name="stearic_acid" step="0.1" required>
+                            <label for="palmitic_acid">Palmitic Acid (%):</label>
+                            <input type="number" id="palmitic_acid" name="palmitic_acid" step="0.1" required>
+                            <label for="melting_point">Melting Point (°C):</label>
+                            <input type="number" id="melting_point" name="melting_point" step="0.1" required>
+                            <label for="solid_fat">Solid Fat (%):</label>
+                            <input type="number" id="solid_fat" name="solid_fat" step="0.1" required>
+                            <label for="viscosity">Viscosity (cP):</label>
+                            <input type="number" id="viscosity" name="viscosity" step="0.1" required>
+                            <label for="moisture">Moisture (%):</label>
+                            <input type="number" id="moisture" name="moisture" step="0.1" required>
+                            <label for="sos">SOS (%):</label>
+                            <input type="number" id="sos" name="sos" step="0.1" required>
+                            <label for="pop">POP (%):</label>
+                            <input type="number" id="pop" name="pop" step="0.1" required>
+                            <label for="pos">POS (%):</label>
+                            <input type="number" id="pos" name="pos" step="0.1" required>
+                            <label for="lead">Lead (ppm):</label>
+                            <input type="number" id="lead" name="lead" step="0.01" required>
+                            <label for="cadmium">Cadmium (ppm):</label>
+                            <input type="number" id="cadmium" name="cadmium" step="0.01" required>
+                            <label for="refining_time">Refining Time (hrs):</label>
+                            <input type="number" id="refining_time" name="refining_time" step="0.1" required>
+                            <label for="conching_time">Conching Time (hrs):</label>
+                            <input type="number" id="conching_time" name="conching_time" step="0.1" required>
+                            <label for="temperature">Temperature (°C):</label>
+                            <input type="number" id="temperature" name="temperature" step="0.1" required>
+                            <label for="nir">NIR:</label>
+                            <input type="number" id="nir" name="nir" step="0.01" required>
+                            <label for="ftir">FTIR:</label>
+                            <input type="number" id="ftir" name="ftir" step="0.01" required>
+                            <button type="submit">Analyze</button>
+                        </form>
+                    </div>
+                    <div class="dashboard-card-footer">
+                        <button class="dashboard-button" onclick="toggleAnalysisForm()">
+                            Show Analysis Form <i class="fas fa-arrow-down"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Skin Recommendations Section -->
+        <div class="system-overview" id="skin">
+            <div class="overview-header">
+                <h2><i class="fas fa-spa"></i> Skin Type Recommendations</h2>
+                <p>Discover personalized skincare products based on cocoa butter properties and your skin type</p>
+            </div>
+            
+            <div class="dashboard">
+                <div class="dashboard-card skin-card">
+                    <div class="dashboard-card-header">
+                        <i class="fas fa-user-circle"></i>
+                        <h2>Personalized Skincare</h2>
+                    </div>
+                    <div class="dashboard-card-content">
+                        <p>Get personalized skincare recommendations based on cocoa butter properties and your specific skin type.</p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check-circle"></i> Skin type assessment</li>
+                            <li><i class="fas fa-check-circle"></i> Product matching algorithm</li>
+                            <li><i class="fas fa-check-circle"></i> Formulation suggestions</li>
+                            <li><i class="fas fa-check-circle"></i> Ingredient compatibility</li>
+                        </ul>
+                    </div>
+                    <div class="dashboard-card-footer">
+                        <button class="dashboard-button" onclick="navigateToSkin()">
+                            Get Recommendations <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Processing Methods Section -->
+        <div class="system-overview" id="processing">
+            <div class="overview-header">
+                <h2><i class="fas fa-industry"></i> Processing Methods</h2>
+                <p>Explore traditional and modern techniques for transforming cocoa beans into premium butter</p>
+            </div>
+            
+            <div class="dashboard">
+                <div class="dashboard-card process-card">
+                    <div class="dashboard-card-header">
+                        <i class="fas fa-cogs"></i>
+                        <h2>Production Techniques</h2>
+                    </div>
+                    <div class="dashboard-card-content">
+                        <p>Explore traditional and modern techniques for transforming cocoa beans into premium butter.</p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check-circle"></i> Traditional fermentation</li>
+                            <li><i class="fas fa-check-circle"></i> Modern pressing techniques</li>
+                            <li><i class="fas fa-check-circle"></i> Solvent extraction methods</li>
+                            <li><i class="fas fa-check-circle"></i> Quality optimization</li>
+                        </ul>
+                    </div>
+                    <div class="dashboard-card-footer">
+                        <button class="dashboard-button" onclick="navigateToProcessing()">
+                            Explore Methods <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Cocoa Butter Analysis System | Advanced Quality Assessment Platform | © 2025</p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">Developed for Cosmetic and Food Industry Professionals</p>
+        </footer>
+        
+        <!-- API Status Indicator -->
+        
+    </div>
+    
+    <script>
+        // API Endpoints
+        const API_ENDPOINTS = {
+            ANALYSIS: "/analyze", // Updated to match backend endpoint
+            SKIN_TYPES: "/skin",
+            PROCESSING: "/processing",
+            STATUS: "/api/status" // Assuming a status endpoint exists or adjust as needed
+        };
+        
+        // Create floating beans
+        function createFloatingBeans() {
+            const header = document.querySelector('header');
+            for (let i = 0; i < 12; i++) {
+                const bean = document.createElement('div');
+                bean.classList.add('floating-beans');
+                bean.style.left = Math.random() * 100 + '%';
+                bean.style.top = Math.random() * 100 + '%';
+                bean.style.animationDelay = Math.random() * 5 + 's';
+                bean.style.width = (Math.random() * 20 + 10) + 'px';
+                bean.style.height = (Math.random() * 10 + 8) + 'px';
+                header.appendChild(bean);
+            }
+        }
+        
+        // Initialize animations
+        function initAnimations() {
+            const ctaButtons = document.querySelectorAll('.cta-button');
+            ctaButtons.forEach((button, index) => {
+                button.style.animationDelay = `${index * 0.2}s`;
+                button.classList.add('fadeInUp');
+            });
+            
+            const dashboardCards = document.querySelectorAll('.dashboard-card');
+            dashboardCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.2 + 0.4}s`;
+                card.classList.add('fadeInUp');
+            });
+            
+            const overviewItems = document.querySelectorAll('.overview-item');
+            overviewItems.forEach((item, index) => {
+                item.style.animationDelay = `${index * 0.1 + 0.6}s`;
+                item.classList.add('fadeInUp');
+            });
+        }
+        
+        // Navigation functions with backend URLs
+        function navigateToAnalysis() {
+            window.location.href = API_ENDPOINTS.ANALYSIS; // Redirects to form page or handles analysis
+        }
+        
+        function navigateToSkin() {
+            window.location.href = API_ENDPOINTS.SKIN_TYPES;
+        }
+        
+        function navigateToProcessing() {
+            window.location.href = API_ENDPOINTS.PROCESSING;
+        }
+        
+        // Toggle analysis form
+        function toggleAnalysisForm() {
+            const form = document.getElementById('analysisForm');
+            form.classList.toggle('active');
+            const button = document.querySelector('.analysis-card .dashboard-button');
+            if (form.classList.contains('active')) {
+                button.textContent = 'Hide Analysis Form';
+                button.innerHTML = 'Hide Analysis Form <i class="fas fa-arrow-up"></i>';
+            } else {
+                button.textContent = 'Show Analysis Form';
+                button.innerHTML = 'Show Analysis Form <i class="fas fa-arrow-down"></i>';
+            }
+        }
+        
+        // Handle form submission
+        document.getElementById('analysisForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            
+            try {
+                const response = await fetch(API_ENDPOINTS.ANALYSIS, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.error) {
+                    alert(`Failed to analyze quality. Please check your inputs and try again. Check console for details.`);
+                    console.error(result.error);
+                } else {
+                    localStorage.setItem('analysisData', JSON.stringify(result));
+                    window.location.href = '/skin';
+                }
+            } catch (error) {
+                alert(`Failed to analyze quality. Please check your inputs and try again. Check console for details.`);
+                console.error('Fetch error:', error);
+            }
+        });
+        
+        // Check backend status
+        async function checkApiStatus() {
+            try {
+                const response = await fetch(API_ENDPOINTS.STATUS);
+                if (response.ok) {
+                    document.getElementById('apiStatus').className = "status-indicator status-connected";
+                    document.getElementById('apiStatusText').textContent = "Connected";
+                } else {
+                    throw new Error('API not available');
+                }
+            } catch (error) {
+                document.getElementById('apiStatus').className = "status-indicator status-disconnected";
+                document.getElementById('apiStatusText').textContent = "Disconnected";
+            }
+        }
+        
+        // Initialize page
+        window.addEventListener('load', function() {
+            createFloatingBeans();
+            initAnimations();
+            checkApiStatus();
+            
+            // Add smooth scrolling for navigation links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    if (this.getAttribute('href').startsWith('#')) {
+                        e.preventDefault();
+                        const target = this.getAttribute('href');
+                        
+                        // Remove active class from all links
+                        document.querySelectorAll('.nav-link').forEach(l => {
+                            l.classList.remove('active');
+                        });
+                        
+                        // Add active class to clicked link
+                        this.classList.add('active');
+                        
+                        // Scroll to target section
+                        document.querySelector(target).scrollIntoView({ 
+                            behavior: 'smooth' 
+                        });
+                    } else {
+                        // External link, allow default behavior
+                    }
+                });
+            });
+            
+            // Add event listeners to dashboard buttons
+            document.querySelectorAll('.dashboard-button').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const page = this.closest('.dashboard-card').classList.contains('analysis-card') ? 'analysis' :
+                                this.closest('.dashboard-card').classList.contains('skin-card') ? 'skin' : 'processing';
+                    
+                    if (page === 'analysis') navigateToAnalysis();
+                    else if (page === 'skin') navigateToSkin();
+                    else navigateToProcessing();
+                });
+            });
+        });
+    </script>
+</body>
+</html>

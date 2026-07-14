@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cocoa Butter Quality Analysis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #5D4037;
+            --secondary: #8D6E63;
+            --accent: #D7CCC8;
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --danger: #F44336;
+            --light: #FFF8F0;
+            --dark: #000604;
+            --fatty-acid: #6A1B9A;
+            --physical: #0288D1;
+            --triglyceride: #388E3C;
+            --contaminant: #D32F2F;
+            --process: #7B1FA2;
+            --instrument: #0097A7;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 100%);
+            min-height: 100vh;
+            color: var(--light);
+            overflow-x: hidden;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 1s ease;
+        }
+        
+        .header-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(129, 93, 83, 0.3) 0%, rgba(78, 52, 46, 0) 70%);
+            z-index: -1;
+        }
+        
+        .floating-beans {
+            position: absolute;
+            width: 30px;
+            height: 20px;
+            background: var(--secondary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 8s infinite ease-in-out;
+        }
+        
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+            animation: titleFloat 4s infinite ease-in-out;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        /* Navigation */
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--accent);
+            color: var(--light);
+            padding: 12px 25px;
+            margin: 0 10px 10px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        .nav-btn.active {
+            background: var(--secondary);
+            border-color: var(--secondary);
+            box-shadow: 0 0 15px rgba(141, 110, 99, 0.5);
+        }
+        
+        /* Page container */
+        .page-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            min-height: 500px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .page {
+            display: none;
+            animation: fadeIn 0.8s ease;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        /* Form Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .form-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 5px solid var(--fatty-acid);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .form-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+        }
+        
+        .form-section h3 i {
+            margin-right: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--accent);
+            padding-left: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .range-indicator {
+            font-size: 0.85rem;
+            font-weight: normal;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .input-group {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 14px 15px;
+            border: 2px solid var(--secondary);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(215, 204, 200, 0.3);
+        }
+        
+        .unit {
+            position: absolute;
+            right: 15px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .value-indicator {
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: var(--accent);
+        }
+        
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .optimal-dot {
+            background-color: var(--success);
+        }
+        
+        .warning-dot {
+            background-color: var(--warning);
+        }
+        
+        .danger-dot {
+            background-color: var(--danger);
+        }
+        
+        /* Triglyceride section style */
+        .form-section:nth-child(3) {
+            border-left-color: var(--triglyceride);
+        }
+        
+        /* Contaminants section style */
+        .form-section:nth-child(4) {
+            border-left-color: var(--contaminant);
+        }
+        
+        /* Process section style */
+        .form-section:nth-child(5) {
+            border-left-color: var(--process);
+        }
+        
+        /* Instrument section style */
+        .form-section:nth-child(6) {
+            border-left-color: var(--instrument);
+        }
+        
+        /* Analyze button */
+        .analyze-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 16px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.4s ease;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 1px;
+        }
+        
+        .analyze-btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: 0.5s;
+        }
+        
+        .analyze-btn:hover:before {
+            left: 100%;
+        }
+        
+        .analyze-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        
+        /* Results Page Styles */
+        .result-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .score-display {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .score-circle {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            position: relative;
+            animation: growCircle 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+        }
+        
+        .score-circle:before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            z-index: 1;
+        }
+        
+        .score-value {
+            font-size: 3.8rem;
+            font-weight: 800;
+            line-height: 1;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 2;
+        }
+        
+        .score-total {
+            font-size: 1.6rem;
+            opacity: 0.9;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            z-index: 2;
+        }
+        
+        .score-label {
+            background: var(--warning);
+            color: var(--dark);
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: inline-block;
+            margin-top: 15px;
+            animation: pulse 2s infinite ease-in-out;
+            box-shadow: 0 4px 10px rgba(255, 193, 7, 0.4);
+        }
+        
+        .key-parameters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+        
+        .param-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(245, 245, 245, 0.05) 100%);
+            border-radius: 12px;
+            padding: 25px 15px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .param-card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--secondary);
+        }
+        
+        .param-card.optimal:before { background: var(--success); }
+        .param-card.warning:before { background: var(--warning); }
+        .param-card.danger:before { background: var(--danger); }
+        
+        .param-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+        }
+        
+        .param-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--light);
+            margin-bottom: 8px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .param-name {
+            font-size: 1.1rem;
+            color: var(--accent);
+            font-weight: 500;
+        }
+        
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .result-table th {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .result-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--light);
+        }
+        
+        .result-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .result-table tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        .status-optimal {
+            color: var(--success);
+            font-weight: 600;
+            position: relative;
+            padding-left: 25px;
+        }
+        
+        .status-optimal:before {
+            content: '✓';
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+        }
+        
+        .status-warning {
+            color: var(--warning);
+            font-weight: 600;
+        }
+        
+        .status-danger {
+            color: var(--danger);
+            font-weight: 600;
+        }
+        
+        /* Recommendations Page */
+        .quality-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 5px solid var(--secondary);
+            animation: fadeIn 0.8s ease;
+        }
+        
+        .quality-title {
+            font-size: 1.8rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .quality-title i {
+            margin-right: 10px;
+            color: var(--secondary);
+        }
+        
+        .quality-description {
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .product-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.12);
+        }
+        
+        .product-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+        
+        .product-name {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--light);
+        }
+        
+        .product-desc {
+            font-size: 0.95rem;
+            color: var(--accent);
+            line-height: 1.5;
+        }
+        
+        .refining-steps {
+            margin-top: 15px;
+            padding-left: 25px;
+        }
+        
+        .refining-steps li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            position: relative;
+        }
+        
+        .refining-steps li:before {
+            content: '•';
+            position: absolute;
+            left: -20px;
+            color: var(--accent);
+            font-size: 1.5rem;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            padding: 25px;
+            font-size: 0.9rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideInLeft {
+            from { transform: translateX(-50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes growCircle {
+            from { transform: scale(0.5) rotate(90deg); opacity: 0; }
+            to { transform: scale(1) rotate(0); opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fadeInUp {
+            from { transform: translateY(30px) scale(0.8); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+        
+        @keyframes titleFloat {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0); }
+        }
+        
+        .fadeInUp {
+            animation: fadeInUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .page-container {
+                padding: 20px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .key-parameters {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-container {
+                flex-wrap: wrap;
+            }
+            
+            .nav-btn {
+                margin: 5px;
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-bg"></div>
+            <div class="floating-beans"></div>
+            <div class="floating-beans"></div>
+            <div class="floating-beans"></div>
+            <h1><i class="fas fa-seedling"></i> Cocoa Butter Quality Analysis</h1>
+            <p>Enter precise laboratory measurements for comprehensive quality assessment. The system validates inputs against industry standards and provides quality predictions.</p>
+        </header>
+        
+        <div class="nav-container">
+            <button class="nav-btn active" data-page="input-page"><i class="fas fa-flask"></i> Input Data</button>
+            <button class="nav-btn" data-page="results-page"><i class="fas fa-chart-bar"></i> Analysis Results</button>
+            <button class="nav-btn" data-page="recommendations-page"><i class="fas fa-lightbulb"></i> Recommendations</button>
+        </div>
+        
+        <div class="page-container">
+            <!-- Input Page -->
+            <div id="input-page" class="page active">
+                <h2 class="section-title"><i class="fas fa-edit"></i> Laboratory Measurements</h2>
+                
+                <div class="form-grid">
+                    <div class="form-section">
+                        <h3 style="color: var(--fatty-acid);"><i class="fas fa-atom"></i> Fatty Acid Composition</h3>
+                        <div class="form-group">
+                            <label for="oleic-acid">Oleic_Acid (C18:1) <span class="range-indicator">26.09 - 38.85%</span></label>
+                            <div class="input-group">
+                                <input type="number" step="0.01" id="oleic-acid" min="26.09" max="38.85" placeholder="enter the value">
+                                <span class="unit">%</span>
+                            </div>
+                            <div class="value-indicator">
+                                <div class="indicator-dot optimal-dot"></div>
+                                <span>Within optimal range</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="stearic-acid">Stearic_Acid (C18:0) <span class="range-indicator">32.06 - 41.00%</span></label>
+                            <div class="input-group">
+                                <input type="number" step="0.01" id="stearic-acid" min="32.06" max="41.00" placeholder="enter the value">
+                                <span class="unit">%</span>
+                            </div>
+                            <div class="value-indicator">
+                                <div class="indicator-dot optimal-dot"></div>
+                                <span>Within optimal range</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="palmitic-acid">Palmitic_Acid (C16:0) <span class="range-indicator">24.00 - 29.98%</span></label>
+                            <div class="input-group">
+                                <input type="number" step="0.01" id="palmitic-acid" min="24.00" max="29.98" placeholder="enter the value">
+                                <span class="unit">%</span>
+                            </div>
+                            <div class="value-indicator">
+                                <div class="indicator-dot optimal-dot"></div>
+                                <span>Within optimal range</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3 style="color: var(--physical);"><i class="fas fa-temperature-high"></i> Physical Properties</h3>
+                        <div class="form-group">
+                            <label for="melting-point">Melting_Point <span class="range-indicator">31.01 - 35.77°C</span></label>
+                            <div class="input-group">
+                                <input type="number" step="0.01" id="melting-point" min="31.01" max="35.77" placeholder="enter the value">
+                                <span class="unit">°C</span>
+                            </div>
+                            <div class="value-indicator">
+                                <div class="indicator-dot optimal-dot"></div>
+                                <span>Within optimal range</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="solid-fat">Solid_Fat_Content (SFC) <span class="range-indicator">50.02 - 64.71%</span></label>
+                            <div class="input-group">
+                                <input type="number" step="0.01" id="solid-fat" min="50.02" max="64.71" placeholder="enter the value">
+                                <span class="unit">%</span>
+                            </div>
+                            <div class="value-indicator">
+                                <div class="indicator-dot optimal-dot"></div>
+                                <span>Within optimal range</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="viscosity">Viscosity <span class="range-indicator">240.74 - 349.95 cP</span></label>
+                            <div class="input-group">
+                                <input type="number" step="1" id="viscosity" min="240" max="350" placeholder="enter teh value">
+                                <span class="unit">cP</span>
+                            </div>
+                            <div class="value-indicator">
+                                <div class="indicator-dot optimal-dot"></div>
+                                <span>Within optimal range</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="moisture">Moisture_Content <span class="range-indicator">0.20 - 0.50%</span></label>
+                            <div class="input-group">
+                                <input type="number" step="0.001" id="moisture" min="0.20" max="0.50" placeholder="enter the value">
+                                <span class="unit">%</span>
+                            </div>
+                            <div class="value-indicator">
+                                <div class="indicator-dot optimal-dot"></div>
+                                <span>Within optimal range</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3 style="color: var(--triglyceride);"><i class="fas fa-vial"></i> Triglyceride Composition</h3>
+                        <div class="form-group">
+                            <label for="sos">SOS <span class="range-indicator">0.30 - 0.44%</span></label>
+                            <div class="input-group">
+                                <input type="number" step="0.001" id="sos" min="0.30" max="0.44" placeholder="enter the value">
+                                <span class="unit">%</span>
+                            </div>
+                            <div class="value-indicator">
+                                <div class="indicator-dot optimal-dot"></div>
+                                <span>Within optimal range</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="pop">POP <span class="range-indicator">0.25 - 0.35%</span></label>
+                            <div class="input-group">
+                                <input type="number" step="0.001" id="pop" min="0.25" max="0.35" placeholder="enter the value">
+                                <span class="unit">%</span>
+                            </div>
+                            <div class="value-indicator">
+                                <div class="indicator-dot optimal-dot"></div>
+                                <span>Within optimal range</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="pos">POS <span class="range-indicator">0.22 - 0.30%</span></label>
+                            <div class="input-group">
+                                <input type="number" step="0.001" id="pos" min="0.22" max="0.30" placeholder="enter the value">
+                                <span class="unit">%</span>
+                            </div>
+                            <div class="value-indicator">
+                                <div class="indicator-dot optimal-dot"></div>
+                                <span>Within optimal range</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3 style="color: var(--contaminant);"><i class="fas fa-skull-crossbones"></i> Contaminants</h3>
+                        <div class="form-group">
+                            <label for="lead">Lead_ppm <span class="range-indicator">0.01 - 0.10 ppm</span></label>
+                            <div class="input-group">
+                                <input type="number" step="0.001" id="lead" min="0.01" max="0.10" placeholder="enter the value">
+                                <span class="unit">ppm</span>
+                            </div>
+                            <div class="value-indicator">
+                                <div class="indicator-dot optimal-dot"></div>
+                                <span>Within optimal range</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="cadmium">Cadmium_ppm <span class="range-indicator">0.003 - 0.020 ppm</span></label>
+                            <div class="input-group">
+                                <input type="number" step="0.001" id="cadmium" min="0.003" max="0.020" placeholder="enter the value">
+                                <span class="unit">ppm</span>
+                            </div>
+                            <div class="value-indicator">
+                                <div class="indicator-dot optimal-dot"></div>
+                                <span>Within optimal range</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3 style="color: var(--process);"><i class="fas fa-sliders-h"></i> Process Parameters</h3>
+                        <div class="form-group">
+                            <label for="refining-time">Refining_Time <span class="range-indicator">10 - 16 min</span></label>
+                            <div class="input-group">
+                                <input type="number" step="0.1" id="refining-time" min="10" max="16" placeholder="enter the value">
+                                <span class="unit">min</span>
+                            </div>
+                            <div class="value-indicator">
+                                <div class="indicator-dot optimal-dot"></div>
+                                <span>Within optimal range</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="conching-time">Conching_Time <span class="range-indicator">4 - 8 hr</span></label>
+                            <div class="input-group">
+                                <input type="number" step="0.1" id="conching-time" min="4" max="8" placeholder="enter the vlue">
+                                <span class="unit">hr</span>
+                            </div>
+                            <div class="value-indicator">
+                                <div class="indicator-dot optimal-dot"></div>
+                                <span>Within optimal range</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="temperature">Temperature <span class="range-indicator">68.32 - 77.77°C</span></label>
+                            <div class="input-group">
+                                <input type="number" step="0.1" id="temperature" min="68.32" max="77.77" placeholder="enter the value">
+                                <span class="unit">°C</span>
+                            </div>
+                            <div class="value-indicator">
+                                <div class="indicator-dot optimal-dot"></div>
+                                <span>Within optimal range</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3 style="color: var(--instrument);"><i class="fas fa-wave-square"></i> Instrument Readings</h3>
+                        <div class="form-group">
+                            <label for="nir">NIR_Absorbance <span class="range-indicator">0.56 - 0.90 AU</span></label>
+                            <div class="input-group">
+                                <input type="number" step="0.001" id="nir" min="0.56" max="0.90" placeholder="enter the value">
+                                <span class="unit">AU</span>
+                            </div>
+                            <div class="value-indicator">
+                                <div class="indicator-dot optimal-dot"></div>
+                                <span>Within optimal range</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="ftir">FTIR_Transmittance <span class="range-indicator">0.50 - 0.80%</span></label>
+                            <div class="input-group">
+                                <input type="number" step="0.001" id="ftir" min="0.50" max="0.80" placeholder="enter the value">
+                                <span class="unit">%</span>
+                            </div>
+                            <div class="value-indicator">
+                                <div class="indicator-dot optimal-dot"></div>
+                                <span>Within optimal range</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="fermentation">Fermentation Type</label>
+                            <select id="fermentation">
+                                <option value="box">Box</option>
+                                <option value="heap" selected>Heap</option>
+                                <option value="hybrid">Hybrid</option>
+                                <option value="mechanical">Mechanical</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="analyze-btn" id="analyze-button">
+                    <i class="fas fa-chart-bar"></i> ANALYZE BUTTER QUALITY
+                </button>
+            </div>
+            
+            <!-- Results Page -->
+            <div id="results-page" class="page">
+                <h2 class="section-title"><i class="fas fa-chart-pie"></i> Quality Analysis Results</h2>
+                
+                <div class="result-content">
+                    <div class="score-display">
+                        <div class="score-circle" id="score-circle" style="background: conic-gradient(#4CAF50 0% 57.7%, #8D6E63 57.7% 100%);">
+                            <div class="score-value" id="score-value">57.7</div>
+                            <div class="score-total">/100</div>
+                        </div>
+                        <div class="score-label" id="score-label">Medium Quality: Needs Process Optimization</div>
+                    </div>
+                    
+                    <div class="key-parameters">
+                        <div class="param-card warning">
+                            <div class="param-value" id="oleic-value">33.0%</div>
+                            <div class="param-name">Oleic Acid</div>
+                        </div>
+                        
+                        <div class="param-card optimal">
+                            <div class="param-value" id="lead-value">0.010 ppm</div>
+                            <div class="param-name">Lead Content</div>
+                        </div>
+                        
+                        <div class="param-card danger">
+                            <div class="param-value" id="viscosity-value">349.95 cP</div>
+                            <div class="param-name">Viscosity</div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="section-title"><i class="fas fa-table"></i> Parameter Analysis</h3>
+                    
+                    <table class="result-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Value</th>
+                                <th>Status</th>
+                                <th>Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody id="parameter-table-body">
+                            <tr>
+                                <td>Oleic Acid</td>
+                                <td>33.000%</td>
+                                <td class="status-warning">Slightly High</td>
+                                <td>May affect texture stability</td>
+                            </tr>
+                            <tr>
+                                <td>Lead Content</td>
+                                <td>0.010 ppm</td>
+                                <td class="status-optimal">Optimal</td>
+                                <td>Within safe limits</td>
+                            </tr>
+                            <tr>
+                                <td>Viscosity</td>
+                                <td>349.950 cP</td>
+                                <td class="status-danger">Too High</td>
+                                <td>May cause application issues</td>
+                            </tr>
+                            <tr>
+                                <td>Methyl Pelat</td>
+                                <td>33.8°C</td>
+                                <td class="status-optimal">Optimal</td>
+                                <td>Good melting point</td>
+                            </tr>
+                            <tr>
+                                <td>Cadmium</td>
+                                <td>0.000 ppm</td>
+                                <td class="status-optimal">Optimal</td>
+                                <td>No contamination detected</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Recommendations Page -->
+            <div id="recommendations-page" class="page">
+                <h2 class="section-title"><i class="fas fa-lightbulb"></i> Product Recommendations</h2>
+                
+                <div class="quality-section" id="recommendations-section">
+                    <h3 class="quality-title"><i class="fas fa-star"></i> Medium Quality Recommendations</h3>
+                    <p class="quality-description">
+                        This cocoa butter is of acceptable quality but requires refining for premium applications. 
+                        The elevated viscosity and oleic acid levels indicate it would benefit from additional processing.
+                    </p>
+                    
+                    <h3 class="section-title"><i class="fas fa-cogs"></i> Recommended Refining Process</h3>
+                    <ul class="refining-steps">
+                        <li><strong>Filtration:</strong> Use activated carbon filtration to remove impurities and contaminants</li>
+                        <li><strong>Deodorization:</strong> Steam deodorization to eliminate any unwanted odors</li>
+                        <li><strong>Fractionation:</strong> Separate triglycerides to improve consistency</li>
+                        <li><strong>Winterization:</strong> Remove high-melting triglycerides to improve texture</li>
+                        <li><strong>Additives:</strong> Consider adding tocopherols to improve stability</li>
+                    </ul>
+                </div>
+                
+                <div class="quality-section">
+                    <h3 class="quality-title"><i class="fas fa-cubes"></i> Suitable Cosmetic Products</h3>
+                    <p class="quality-description">
+                        After refining, this cocoa butter may be suitable for the following cosmetic applications:
+                    </p>
+                    
+                    <div class="product-grid">
+                        <div class="product-card">
+                            <div class="product-icon"><i class="fas fa-pump-soap"></i></div>
+                            <h4 class="product-name">Body Lotions</h4>
+                            <p class="product-desc">Provides moisturization with medium skin absorption rate</p>
+                        </div>
+                        
+                        <div class="product-card">
+                            <div class="product-icon"><i class="fas fa-soap"></i></div>
+                            <h4 class="product-name">Bar Soaps</h4>
+                            <p class="product-desc">Adds moisturizing properties to cleansing bars</p>
+                        </div>
+                        
+                        <div class="product-card">
+                            <div class="product-icon"><i class="fas fa-spa"></i></div>
+                            <h4 class="product-name">Hair Conditioners</h4>
+                            <p class="product-desc">Helps improve hair texture and manageability</p>
+                        </div>
+                        
+                        <div class="product-card">
+                            <div class="product-icon"><i class="fas fa-hand-sparkles"></i></div>
+                            <h4 class="product-name">Hand Creams</h4>
+                            <p class="product-desc">Provides protection and moisturization for hands</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Cocoa Butter Quality Analysis System | Developed for Cosmetic Industry Standards | © 2023</p>
+        </footer>
+    </div>
+    
+    <!-- ... (Keep the existing HTML structure up to the script tag) ... -->
+
+<script>
+    // Navigation (Unchanged)
+    document.querySelectorAll('.nav-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            const pageId = this.getAttribute('data-page');
+            document.getElementById(pageId).classList.add('active');
+        });
+    });
+
+    document.getElementById('analyze-button').addEventListener('click', async function() {
+    const formData = {
+        oleic_acid: parseFloat(document.getElementById('oleic-acid').value),
+        stearic_acid: parseFloat(document.getElementById('stearic-acid').value),
+        palmitic_acid: parseFloat(document.getElementById('palmitic-acid').value),
+        melting_point: parseFloat(document.getElementById('melting-point').value),
+        solid_fat: parseFloat(document.getElementById('solid-fat').value),
+        viscosity: parseFloat(document.getElementById('viscosity').value),
+        moisture: parseFloat(document.getElementById('moisture').value),
+        sos: parseFloat(document.getElementById('sos').value),
+        pop: parseFloat(document.getElementById('pop').value),
+        pos: parseFloat(document.getElementById('pos').value),
+        lead: parseFloat(document.getElementById('lead').value),
+        cadmium: parseFloat(document.getElementById('cadmium').value),
+        refining_time: parseFloat(document.getElementById('refining-time').value),
+        conching_time: parseFloat(document.getElementById('conching-time').value),
+        temperature: parseFloat(document.getElementById('temperature').value),
+        nir: parseFloat(document.getElementById('nir').value),
+        ftir: parseFloat(document.getElementById('ftir').value),
+        fermentation: document.getElementById('fermentation').value
+    };
+
+    // Client-side validation for all fields
+    const errors = [];
+    if (isNaN(formData.oleic_acid) || formData.oleic_acid < 26.09 || formData.oleic_acid > 38.85) {
+        errors.push("Oleic Acid must be between 26.09 and 38.85%");
+    }
+    if (isNaN(formData.stearic_acid) || formData.stearic_acid < 32.06 || formData.stearic_acid > 41.00) {
+        errors.push("Stearic Acid must be between 32.06 and 41.00%");
+    }
+    if (isNaN(formData.palmitic_acid) || formData.palmitic_acid < 24.00 || formData.palmitic_acid > 29.98) {
+        errors.push("Palmitic Acid must be between 24.00 and 29.98%");
+    }
+    if (isNaN(formData.melting_point) || formData.melting_point < 31.01 || formData.melting_point > 35.77) {
+        errors.push("Melting Point must be between 31.01 and 35.77°C");
+    }
+    if (isNaN(formData.solid_fat) || formData.solid_fat < 50.02 || formData.solid_fat > 64.71) {
+        errors.push("Solid Fat Content must be between 50.02 and 64.71%");
+    }
+    if (isNaN(formData.viscosity) || formData.viscosity < 240.74 || formData.viscosity > 349.95) {
+        errors.push("Viscosity must be between 240.74 and 349.95 cP");
+    }
+    if (isNaN(formData.moisture) || formData.moisture < 0.20 || formData.moisture > 0.50) {
+        errors.push("Moisture Content must be between 0.20 and 0.50%");
+    }
+    if (isNaN(formData.sos) || formData.sos < 0.30 || formData.sos > 0.44) {
+        errors.push("SOS must be between 0.30 and 0.44%");
+    }
+    if (isNaN(formData.pop) || formData.pop < 0.25 || formData.pop > 0.35) {
+        errors.push("POP must be between 0.25 and 0.35%");
+    }
+    if (isNaN(formData.pos) || formData.pos < 0.22 || formData.pos > 0.30) {
+        errors.push("POS must be between 0.22 and 0.30%");
+    }
+    if (isNaN(formData.lead) || formData.lead < 0.01 || formData.lead > 0.10) {
+        errors.push("Lead must be between 0.01 and 0.10 ppm");
+    }
+    if (isNaN(formData.cadmium) || formData.cadmium < 0.003 || formData.cadmium > 0.020) {
+        errors.push("Cadmium must be between 0.003 and 0.020 ppm");
+    }
+    if (isNaN(formData.refining_time) || formData.refining_time < 10 || formData.refining_time > 16) {
+        errors.push("Refining Time must be between 10 and 16 min");
+    }
+    if (isNaN(formData.conching_time) || formData.conching_time < 4 || formData.conching_time > 8) {
+        errors.push("Conching Time must be between 4 and 8 hr");
+    }
+    if (isNaN(formData.temperature) || formData.temperature < 68.32 || formData.temperature > 77.77) {
+        errors.push("Temperature must be between 68.32 and 77.77°C");
+    }
+    if (isNaN(formData.nir) || formData.nir < 0.56 || formData.nir > 0.90) {
+        errors.push("NIR Absorbance must be between 0.56 and 0.90 AU");
+    }
+    if (isNaN(formData.ftir) || formData.ftir < 0.50 || formData.ftir > 0.80) {
+        errors.push("FTIR Transmittance must be between 0.50 and 0.80%");
+    }
+
+    if (errors.length > 0) {
+        alert("Input errors:\n" + errors.join("\n"));
+        return;
+    }
+
+    console.log('Form Data:', formData);
+
+    try {
+        const response = await fetch('http://localhost:5000/analyze', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('API Error:', errorData);
+            throw new Error(`API request failed: ${JSON.stringify(errorData)}`);
+        }
+
+        const data = await response.json();
+        console.log('Response Data:', data);
+
+        // Save analysis data to localStorage
+        localStorage.setItem('analysisData', JSON.stringify(data));
+
+        // Update result values
+        document.getElementById('score-value').textContent = data.quality_score.toFixed(1);
+        document.getElementById('oleic-value').textContent = formData.oleic_acid.toFixed(1) + '%';
+        document.getElementById('lead-value').textContent = formData.lead.toFixed(3) + ' ppm';
+        document.getElementById('viscosity-value').textContent = formData.viscosity.toFixed(1) + ' cP';
+
+        // Update parameter table
+        const parameterTableBody = document.getElementById('parameter-table-body');
+        parameterTableBody.innerHTML = '';
+        data.parameters.forEach(param => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${param.parameter}</td>
+                <td>${param.value}</td>
+                <td class="${param.status === 'Optimal' ? 'status-optimal' : param.status === 'Too High' || param.status === 'Too Low' ? 'status-danger' : 'status-warning'}">${param.status}</td>
+                <td>${param.impact}</td>
+            `;
+            parameterTableBody.appendChild(row);
+        });
+
+        // Update score circle color and label
+        let scoreCircleStyle = '';
+        let scoreLabelText = '';
+        let scoreLabelColor = '';
+        if (data.quality_category === 'good') {
+            scoreCircleStyle = `conic-gradient(#4CAF50 0% ${data.quality_score}%, #8D6E63 ${data.quality_score}% 100%)`;
+            scoreLabelText = 'Excellent Quality: Suitable for premium cosmetics';
+            scoreLabelColor = '#4CAF50';
+        } else if (data.quality_category === 'medium') {
+            scoreCircleStyle = `conic-gradient(#FFC107 0% ${data.quality_score}%, #8D6E63 ${data.quality_score}% 100%)`;
+            scoreLabelText = 'Medium Quality: Needs process optimization';
+            scoreLabelColor = '#FFC107';
+        } else {
+            scoreCircleStyle = `conic-gradient(#F44336 0% ${data.quality_score}%, #8D6E63 ${data.quality_score}% 100%)`;
+            scoreLabelText = 'Low Quality: Suitable for non-premium products';
+            scoreLabelColor = '#F44336';
+        }
+
+        document.getElementById('score-circle').style.background = scoreCircleStyle;
+        document.getElementById('score-label').textContent = scoreLabelText;
+        document.getElementById('score-label').style.background = scoreLabelColor;
+
+        // Update recommendations
+        updateRecommendations(data.recommendations);
+
+        // Switch to results page
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector('[data-page="results-page"]').classList.add('active');
+        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+        document.getElementById('results-page').classList.add('active');
+
+        // Animate elements
+        const scoreCircle = document.querySelector('.score-circle');
+        scoreCircle.style.animation = 'none';
+        setTimeout(() => {
+            scoreCircle.style.animation = 'growCircle 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        }, 10);
+
+        const paramCards = document.querySelectorAll('.param-card');
+        paramCards.forEach(card => {
+            card.classList.remove('fadeInUp');
+            setTimeout(() => card.classList.add('fadeInUp'), 300);
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to analyze quality. Please check your inputs and try again. Check console for details.');
+    }
+});
+
+    // Update recommendations based on backend response
+    function updateRecommendations(recommendations) {
+        const recommendationsSection = document.getElementById('recommendations-section');
+        let htmlContent = `
+            <h3 class="quality-title"><i class="fas fa-star"></i> ${recommendations.category.charAt(0).toUpperCase() + recommendations.category.slice(1)} Quality Recommendations</h3>
+            <p class="quality-description">${recommendations.description}</p>
+        `;
+
+        if (recommendations.refining_steps && recommendations.refining_steps.length > 0) {
+            htmlContent += `
+                <h3 class="section-title"><i class="fas fa-cogs"></i> Recommended Refining Process</h3>
+                <ul class="refining-steps">
+                    ${recommendations.refining_steps.map(step => `<li>${step}</li>`).join('')}
+                </ul>
+            `;
+        }
+
+        if (recommendations.products && recommendations.products.length > 0) {
+            htmlContent += `
+                <h3 class="section-title"><i class="fas fa-cubes"></i> Suitable Products</h3>
+                <div class="product-grid">
+                    ${recommendations.products.map(product => `
+                        <div class="product-card">
+                            <div class="product-icon"><i class="fas fa-${product.name.toLowerCase().includes('lip') ? 'lipstick' : product.name.toLowerCase().includes('serum') ? 'spa' : product.name.toLowerCase().includes('baby') ? 'baby' : product.name.toLowerCase().includes('body') ? 'crown' : product.name.toLowerCase().includes('soap') ? 'soap' : product.name.toLowerCase().includes('lubricant') ? 'oil-can' : product.name.toLowerCase().includes('coating') ? 'paint-roller' : product.name.toLowerCase().includes('candle') ? 'fire' : 'cube'}"></i></div>
+                            <h4 class="product-name">${product.name}</h4>
+                            <p class="product-desc">${product.desc}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        recommendationsSection.innerHTML = htmlContent;
+    }
+
+    // Initialize floating beans (Unchanged)
+    function createFloatingBeans() {
+        const header = document.querySelector('header');
+        for (let i = 0; i < 8; i++) {
+            const bean = document.createElement('div');
+            bean.classList.add('floating-beans');
+            bean.style.left = Math.random() * 100 + '%';
+            bean.style.top = Math.random() * 100 + '%';
+            bean.style.animationDelay = Math.random() * 5 + 's';
+            bean.style.width = (Math.random() * 20 + 10) + 'px';
+            bean.style.height = (Math.random() * 10 + 8) + 'px';
+            header.appendChild(bean);
+        }
+    }
+
+    window.addEventListener('load', function() {
+        createFloatingBeans();
+    });
+</script>
+</body>
+</html>
